@@ -19,8 +19,8 @@ VCO.Util = {
 
 	setOptions: function (obj, options) {
 		obj.options = VCO.Util.extend({}, obj.options, options);
-		if (obj.options.uniqueid === "") {
-			obj.options.uniqueid = VCO.Util.unique_ID(6);
+		if (obj.options.unique_id === "") {
+			obj.options.unique_id = VCO.Util.unique_ID(6);
 		}
 	},
 
@@ -72,8 +72,8 @@ VCO.Util = {
 
 	setData: function (obj, data) {
 		obj.data = VCO.Util.extend({}, obj.data, data);
-		if (obj.data.uniqueid === "") {
-			obj.data.uniqueid = VCO.Util.unique_ID(6);
+		if (obj.data.unique_id === "") {
+			obj.data.unique_id = VCO.Util.unique_ID(6);
 		}
 	},
 
@@ -142,6 +142,29 @@ VCO.Util = {
 			return "vco-" + randomID(size);
 		}
 	},
+
+	ensureUniqueKey: function(obj, candidate) {
+		if (!candidate) { candidate = VCO.Util.unique_ID(6); }
+
+		if (!(candidate in obj)) { return candidate; }
+
+		var root = candidate.match(/^(.+)(-\d+)?$/)[1];
+		var similar_ids = [];
+		// get an alternative
+		for (key in obj) {
+			if (key.match(/^(.+?)(-\d+)?$/)[1] == root) {
+				similar_ids.push(key);
+			}
+		}
+		candidate = root + "-" + (similar_ids.length + 1);
+
+		for (var counter = similar_ids.length; similar_ids.indexOf(candidate) != -1; counter++) {
+			candidate = root + '-' + counter;
+		}
+
+		return candidate;
+	},
+
 
 	htmlify: function(str) {
 		//if (str.match(/<\s*p[^>]*>([^<]*)<\s*\/\s*p\s*>/)) {
@@ -596,7 +619,7 @@ VCO.Util = {
 			properties = Object.keys(o);
 		} else { // all this to support IE 8
 		    for (var p in o) if (Object.prototype.hasOwnProperty.call(o,p)) properties.push(p);
-		}
+    }
 		for (var i = 0; i < properties.length; i++) {
 			var k = properties[i];
 			if (o[k] != null && typeof o[k] != "string") return false;
